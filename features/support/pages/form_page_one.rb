@@ -7,7 +7,7 @@ class FormPageOne
 	PAGE_TITLE = 'Get a Traditional Term Quote'
 	ERROR_DESCRIPTION = 'Based on the information you’ve provided, you do not meet our age guidelines for this product.'
 
-	# Identifiers
+	# IDENTIFIERS
 	PAGE_TITLE_ID = { id: 'formCmpnt-heading productName-large' }
 	SEE_YOUR_QUOTE_BUTTON_ID = { id: 'seeQuote'}
 	INFO_TEXT_ID = { css: 'html body div div div.formCmpnt.combinedForm-quoteForm.bg-responsive div.row.formCmpnt-content.small-collapse.large-uncollapse div.small-12.large-8.large-offset-3.columns.formCmpnt-form.qfWide div.row.collapse.show-for-large div.large-9.large-offset-2.columns p.inlineValidation.inlineValidation-quote.show'}
@@ -24,8 +24,8 @@ class FormPageOne
 	NICOTINE_NO_ID = { id: 'nicotineUseNo' }
 	COVERAGE_AMOUNT_ID = { id: 'coverageAmount' }
 	TERM_LENGTH_ID = { id: 'termLength' }
-	AAA_MEMBER_YES_ID = { id: 'isMemberYes' }
-	AAA_MEMBER_NO_ID = { id: 'isMemberNO' }
+	MEMBER_YES_ID = {id: 'isMemberYes' }
+	MEMBER_NO_ID = {id: 'isMemberNO' }
 	EMAIL_ID = { id: 'contact_email' }
 	RATE_YOUR_HEALTH_ID = { id: 'rateYourHealth' }
 
@@ -34,14 +34,10 @@ class FormPageOne
 	ERROR_DESCRIPTION_ID = { :class => 'error-desc' }
 	ERROR_SECONDARY_DESCRIPTION_ID = { :class => 'error-secondarydesc'}
 
-	# Bools
+	# BOOLS
 	def page_loaded?
-		ti = find_element PAGE_TITLE_ID
-		if ti == PAGE_TITLE
-			true
-		else
-			false
-		end
+		title = find_element PAGE_TITLE_ID
+		title == PAGE_TITLE ? true : false
 	end
 
 	def info_text_visible?
@@ -60,14 +56,14 @@ class FormPageOne
 		find_element(ERROR_DESCRIPTION_ID).text == ERROR_DESCRIPTION
 	end
 
-	# Click
+	# CLICK
 	def click_see_quote_button
 		find_element(SEE_YOUR_QUOTE_BUTTON_ID).click
 	end
 
-	# SELECT METHODS
+	# SELECT
 	def select_dob_month(month)
-		month_drop_down = find_element(DOB_MONTH_ID).find_element(:css,"option[value='#{month}']").click
+		find_element(DOB_MONTH_ID).find_element(:css,"option[value='#{month}']").click
 	end
 
 	def select_dob_day(day)
@@ -87,9 +83,6 @@ class FormPageOne
 	end
 
 	def select_gender(gender)
-		# dropdown = find_element(GENDER_ID)
-		# select_list = Selenium::WebDriver::Support::Select.new(dropdown)
-		# select_list.select_by(:text, gender)
 		option = find_element(GENDER_ID).find_elements(:tag_name,"option").detect { |option| option.attribute('text').eql? "#{gender}"}
 		option.click
 	end
@@ -98,12 +91,12 @@ class FormPageOne
     find_element(TERM_LENGTH_ID).find_element(:css,"option[value='#{term}']").click
   end
 
-  def select_aaa_member(select)
+  def select_member(select)
     case select
 		when 'Yes', 'yes', :yes
-      find_element(AAA_MEMBER_YES_ID).click
+      find_element(MEMBER_YES_ID).click
     when 'No', 'no', :no
-      find_element(AAA_MEMBER_NO_ID).click
+      find_element(MEMBER_NO_ID).click
     end
 	end
 
@@ -117,7 +110,7 @@ class FormPageOne
 	end
 
 	def select_rate_your_health(select)
-		find_element(RATE_YOUR_HEALTH_ID).find_element(:css,"option[value='#{select}']").click
+		find_element(RATE_YOUR_HEALTH_ID).find_element(:css,"option[value='#{select}']").click if wait_for_element_visible(RATE_YOUR_HEALTH_ID)
 	end
 	#---
 
@@ -129,7 +122,7 @@ class FormPageOne
 		find_element(ERROR_SECONDARY_DESCRIPTION_ID).text
 	end
 
-	# Setters
+	# SETTERS
 	def set_date(date)
 		date = Date.parse date
 
@@ -142,9 +135,9 @@ class FormPageOne
 		find_element(ZIP_CODE_ID).send_keys(zip)
 	end
 
-	def set_height(feet=4, inches=0)
-		select_height_feet feet
-		select_height_inches inches
+	def set_height(feet: nil, inches: nil)
+		select_height_feet feet unless feet.nil?
+		select_height_inches inches unless inches.nil?
 	end
 
 	def set_weight(lbs)
@@ -153,5 +146,32 @@ class FormPageOne
 
 	#---
 
-
+	def fill_form(input_data)
+		input_data.each do |element|
+			case element.first
+			when :zip
+				set_zip element[1]
+			when :height_ft
+				select_height_feet element[1]
+			when :height_in
+				select_height_inches element[1]
+			when :weight
+				set_weight element[1]
+			when :gender
+				select_gender element[1]
+			when :nicotine
+				select_nicotine element[1]
+			when :dob
+				set_date element[1]
+			when :health_rating
+				select_rate_your_health element[1]
+			when :term_lenght
+				select_term_length element[1]
+			when :member
+					select_member element[1]
+			when :email
+				# TODO: Add email
+			end
+		end
+	end
 end

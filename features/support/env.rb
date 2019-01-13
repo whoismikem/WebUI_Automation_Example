@@ -1,15 +1,27 @@
 require 'selenium-webdriver'
 require_relative 'app'
 
-$LIFE_INSURANCE_APP = App.new
+class UIDriver
+  def self.setup(driver)
+    @@browser = driver
+  end
+
+  def self.browser
+    @@browser
+  end
+
+  def self.kill
+    @@browser.quit
+    @@browser = nil
+  end
+end
 
 Before do
-	$browser = Selenium::WebDriver.for :firefox
-	$browser.get "https://www.aaalife.com/term-life-insurance-quote-input"
+  browser = Selenium::WebDriver.for :firefox
+  UIDriver.setup browser
+  UIDriver.browser.get "https://www.aaalife.com/term-life-insurance-quote-input" # TODO: Make passing of URL possible
 end
 
-After do 
-	$browser.quit
+After do
+  UIDriver.kill
 end
-
-

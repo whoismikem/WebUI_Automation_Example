@@ -15,7 +15,12 @@ Feature: Online Life Insurance Quote Request App
     And customer is provided with contact phone number of "(888) 422-7020"
 
   @minimal_info
-  Scenario: Submit minimal required form information
-    Given the customers enters minimal required information
+  Scenario Outline: Submit minimal required form information
+    Given the customers enters minimal required information <zip> <height_ft> <height_in> <weight> <gender> <nicotine> <dob> <health_rating> <term_length> <member> <email>
     And the form is submitted
     Then the customer is taken to form page 2
+
+    Examples:
+      | zip     | height_ft | height_in | weight |  gender    | nicotine | dob          | health_rating | term_length | member | email |
+      | '48081' | 6         | 8         | 199    |  'Male'    | 'no'     | '01/01/1980' | 'good'        | 10          | 'no'   |   ''  |
+      | '48313' | 5         | 7         | 120    |  'Female'  | 'yes'    | '05/03/1989' | 'good'        | 10          | 'no'   |   ''  |
